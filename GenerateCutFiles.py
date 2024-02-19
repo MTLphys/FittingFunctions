@@ -1,9 +1,10 @@
 import matplotlib.pyplot as plt 
 import numpy as np 
 import glob as gb 
-directory = 'C:/Users/mattl/OneDrive - University of Cincinnati/Desktop/Lab Data/HFWMV2 CS NW InitialTest/LongCollections/'
-endmoniker = '100'
+directory = '/home/matthew/Desktop/DataOutputs/HFWM DATA/HFWMV2 CS NW InitialTest/840nm/'
+endmoniker = ''
 filetype = '.csv'
+outputfile = 'Results/'
 integration= .15
 files = gb.glob(directory+'*'+endmoniker+filetype)
 fig,axs = plt.subplots(2)
@@ -11,6 +12,7 @@ axs[0].set_yscale('log')
 axs[1].set_yscale('log')
 print(files)
 for file in files : 
+    print(file)
     filetag = file[len(directory):-4]
     contents = np.loadtxt(file,delimiter=';')
     indicest12= np.where(np.abs(contents[:,0])<=integration)[0]
@@ -25,6 +27,6 @@ for file in files :
     t3ref = contents[:,0]
     axs[1].plot(t3ref[1:],t3refcut[1:],label = filetag[0:6])
     output = np.vstack((t3ref[1:],t3refcut[1:])).transpose()
-    np.savetxt(directory+filetag+'T3refcut'+filetype,output,delimiter=';')
+    np.savetxt(directory+outputfile+filetag+'T3refcut'+filetype,output,delimiter=';')
     output = np.vstack((t12[1:],t12cut[1:])).transpose()
-    np.savetxt(directory+filetag+'T12cut'+filetype,output,delimiter=';')
+    np.savetxt(directory+outputfile+filetag+'T12cut'+filetype,output,delimiter=';')
