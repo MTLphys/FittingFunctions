@@ -30,7 +30,7 @@ sigeh  = 0.00050 #exciton electron/hole scattering Parameter
 sigxi  = 0.00016 #exciton impurity scattering Parameter
 sigi   = 0.00000 #impurity impurity scattering Parameter
 sigieh = 0.00050 #impurity electron/hole scattering Parameter
-
+sigv = np.asarray([sigx,sigxi,sigi])
 A = N1 + N2 + N3         # total exciton density
 Ai = N1i+N2i+N3i         # total impurity bound exciton density
 Aeh = N1eh + N2eh + N3eh # total electron hole density
@@ -72,11 +72,30 @@ nw  = 1
 PSF = 1
 EID = 1
 def vecdim(a,b): 
+    '''
+        Element wise multiplier for vector time variables
+        takes 
+        a =  n length base vector element 
+        b =  m length time axis over which to multiply 
+        returns 
+        nxm vector field
+    
+    '''
     v =  []
     for bi in b:
         v.append(a*bi)
     return np.asarray(v)
 def aterm(t,tau,i,j,k):
+    '''psf term for optical bloch equation solution 
+    takes 
+    t = the time delay for time resolving reference pulse
+    tau = delay between first and second pulses 
+    i = index of primary term for the 
+    j = index of secondary term for the 
+    k = scattering term for free exciton(0) or impurity(1)
+    return 
+    vector field 
+    '''
     if(k==0):
         wf =np.heaviside(tau,1.0)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+sigxi*N1i+sigeh*N1eh))*tau)
         lf = np.exp(-(tau13-tau)/T1)
@@ -87,6 +106,17 @@ def aterm(t,tau,i,j,k):
     cp = np.conj(mu[j])*mu[j].dot(u3)*mu[i].dot(u2)*np.conj(mu[i]).dot(np.conj(u1))
     return vecdim(wf*lf*tf,cp)
 def bterm(t,tau,i,j,k):
+    """
+    complex conjugate psf term for optical bloch equation solution 
+    takes 
+    t = the time delay for time resolving reference pulse
+    tau = delay between first and second pulses 
+    i = index of primary term for the 
+    j = index of secondary term for the 
+    k = scattering term for free exciton(0) or impurity(1)
+    return 
+    vector field
+    """
     if(k==0):    
         wf =np.heaviside(tau,1.0)*np.exp(1.0j*(O[i]-1.0j*(sigx*N2+sigxi*N2i+sigeh*N2eh))*tau)
         lf = np.exp(-(tau13)/T1)
@@ -97,26 +127,48 @@ def bterm(t,tau,i,j,k):
     cp = np.conj(mu[j])*mu[j].dot(u3)*np.conj(mu[i]).dot(np.conj(u1))*mu[i].dot(u2)
     return vecdim(wf*lf*tf,cp)
 def cterm(t,tau,i,j,k):
+    """
+    EID term for optical bloch equation solution 
+    takes 
+    t = the time delay for time resolving reference pulse
+    tau = delay between first and second pulses 
+    i = index of primary term for the 
+    j = index of secondary term for the 
+    k = scattering term for free exciton(0) or impurity(1)
+    return 
+    vector field
+    """
     if(k==0):
-        wf =np.heaviside(tau,1.0)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+sigxi*N1i+sigeh*N1eh))*tau)
+        wf = np.heaviside(tau,1.0)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+sigxi*N1i+sigeh*N1eh))*tau)
         lf = np.exp(-(tau13-tau)/T1)
         ei =T1*(1-np.exp((tau13-t)/T1))
     else:
-        wf =np.heaviside(tau,1.0)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+sigxi*N1i+sigeh*N1eh))*tau)
-        lf = np.exp(-(tau13-tau)/T1)
-        ei =T1*(1-np.exp((tau13-t)/T1))
+        wf = np.heaviside(tau,1.0)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+sigxi*N1i+sigeh*N1eh))*tau)
+        lf = np.exp(-(tau13-tau)/Ti1)
+        ei =Ti1*(1-np.exp((tau13-t)/Ti1))
     tf = np.exp(1.0j*Ot[j]*(tau13-t))
     cp = np.conj(mu[j])*mu[j].dot(u3)*mu[i].dot(u2)*np.conj(mu[i]).dot(np.conj(u1))
     return vecdim(wf*ei*lf*tf,cp)
 def dterm(t,tau,i,j,k):
+    """
+    complex conjugate EID term for optical bloch equation solution 
+    takes 
+    t = the time delay for time resolving reference pulse
+    tau = delay between first and second pulses 
+    i = index of primary term for the 
+    j = index of secondary term for the 
+    k = scattering term for free exciton(0) or impurity(1) type term
+    return 
+    vector field
+    """
     if(k==0):
         wf =np.heaviside(tau,1.0)*np.exp(1.0j*(O[i]-1.0j*(sigx*N2+sigxi*N2i+sigeh*N2eh))*tau)
         lf = np.exp(-(tau13)/T1)
         ei =T1*(1-np.exp((tau13-t)/T1))
     else: 
         wf =np.heaviside(tau,1.0)*np.exp(1.0j*(O[i]-1.0j*(sigx*N2+sigxi*N2i+sigeh*N2eh))*tau)
-        lf = np.exp(-(tau13)/T1)
-        ei =T1*(1-np.exp((tau13-t)/T1))
+        lf = np.exp(-(tau13)/Ti1)
+        ei =Ti1*(1-np.exp((tau13-t)/Ti1))
     tf = np.exp(1.0j*Ot[j]*(tau13-t))
     cp = np.conj(mu[j])*mu[j].dot(u3)*np.conj(mu[i]).dot(np.conj(u1))*mu[i].dot(u2)
     return vecdim(wf*ei*lf*tf,cp)
@@ -127,12 +179,12 @@ def Pnw(t,tau):
         for j in range(3):
             if(j<2):
                 sig = sig+PSF*(aterm(t,tau,i,j,0)+bterm(t,tau,i,j,0))
-            sig =sig+EID*A*sigx*(cterm(t,tau,i,j)+dterm(t,tau,i,j))
+            sig =sig+EID*A*sigv*(cterm(t,tau,i,j,int(np.floor(j/2)))+dterm(t,tau,i,j,int(np.floor(j/2))))
     return 1*K*-1.0j*A/(c.hbar**3)*np.heaviside(t-tau13,1.0)*sig
 def Pimp(t,tau):
     sig = PSF*(2*aterm(t,tau,2,2,1)+2*bterm(t,tau,2,2,1))
     for i in range(3):
-        sig=sig + EID*Ai*sigx*(cterm(t,tau,i,2)+dterm(t,tau,i,2))
+        sig=sig + EID*Ai*sigx*(cterm(t,tau,i,2,)+dterm(t,tau,i,2,))
     return 1*K*-1.0j*Ai/(c.hbar**3)*np.heaviside(t-tau13,1.0)*sig
 def P(t,tau):
     return nw*Pnw(t,tau)+imp*Pimp(t,tau)
