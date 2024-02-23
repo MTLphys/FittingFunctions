@@ -2,7 +2,6 @@
 import scipy.constants as c
 import numpy as np 
 import matplotlib.pyplot as plt 
-exwl = 815 #exciting wavelength
 def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-12):
     u1  = np.asarray([1.0,0.0])#polarization state pulse 1
     u2  = np.asarray([1.0,0.0])#polarization state pulse 2
@@ -250,7 +249,7 @@ def fitfuncttau(tau,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,t=7
     Ti1= 100.0e-12 #impurity bound exciton Lifetime
     
 
-    E0 =c.e*(1.5139)/c.hbar 
+    E0 =c.e*(1.5065)/c.hbar 
     E21 =  E0 
     E61 =  E0+Ex1 
     Ei21 = E0+EB 
