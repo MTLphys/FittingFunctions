@@ -2,7 +2,7 @@
 import scipy.constants as c
 import numpy as np 
 import matplotlib.pyplot as plt 
-def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-12):
+def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=0e-12):
     u1  = np.asarray([1.0,0.0])#polarization state pulse 1
     u2  = np.asarray([1.0,0.0])#polarization state pulse 2
     u3  = np.asarray([1.0,0.0])#polarization state pulse 3
@@ -38,7 +38,7 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-
     Ti1= 100.0e-12 #impurity bound exciton Lifetime
     
 
-    E0 =c.e*(1.5139)/c.hbar 
+    E0 =c.e*(1.507)/c.hbar 
     E21 =  E0 
     E61 =  E0+Ex1 
     Ei21 = E0+EB 
@@ -56,7 +56,7 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-
     O  = np.asarray([ O21, O61, Oi21, Oi61]) 
     Ot = np.asarray([Ot21,Ot61,Oti21,Oti61]) 
 
-    tau13 = 7.0e-12 
+    tau13 = 4.0e-12 
     mu21 = ol21*np.asarray([1.0,0.0])   #dipole moment of hh exciton state 
     mu61 = ol61*np.asarray([1.0,0.0])   #dipole moment of lh exciton state 
     mui21 = oli21*np.asarray([1.0,0.0]) #dipole moment of hh bound exciton state 
@@ -94,11 +94,12 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-
         return 
         vector field 
         '''
+        #print('PSF Term',i,j,k)
         if(k==0):
-            wf = np.heaviside(tau,1.0)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+sigxi*N1i+sigeh*N1eh))*tau)
+            wf = np.heaviside(tau,0.5)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+sigxi*N1i+sigeh*N1eh))*tau)
             lf = np.exp(-(tau13-tau)/T1)
         else:
-            wf =  np.heaviside(tau,1.0)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigi*N1i+sigxi*N1+sigieh*N1eh))*tau)
+            wf =  np.heaviside(tau,0.5)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigi*N1i+sigxi*N1+sigieh*N1eh))*tau)
             lf = np.exp(-(tau13-tau)/Ti1)
         tf = np.exp(1.0j*Ot[j]*(tau13-t))
         cp = np.conj(mu[j])*mu[j].dot(u3)*mu[i].dot(u2)*np.conj(mu[i]).dot(np.conj(u1))
@@ -116,10 +117,10 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-
         vector field
         """
         if(k==0):    
-            wf = np.heaviside(-tau,1.0)*np.exp(1.0j*(O[i]-1.0j*(sigx*N2+sigxi*N2i+sigeh*N2eh))*tau)
+            wf = np.heaviside(-tau,0.5)*np.exp(1.0j*(O[i]-1.0j*(sigx*N2+sigxi*N2i+sigeh*N2eh))*tau)
             lf = np.exp(-(tau13)/T1)
         else:
-            wf = np.heaviside(-tau,1.0)*np.exp(1.0j*(O[i]-1.0j*(sigi*N2i+sigxi*N2+sigieh*N2eh))*tau)
+            wf = np.heaviside(-tau,0.5)*np.exp(1.0j*(O[i]-1.0j*(sigi*N2i+sigxi*N2+sigieh*N2eh))*tau)
             lf = np.exp(-(tau13)/Ti1)
         tf = np.exp(1.0j*Ot[j]*(tau13-t))
         cp = np.conj(mu[j])*mu[j].dot(u3)*np.conj(mu[i]).dot(np.conj(u1))*mu[i].dot(u2)
@@ -136,12 +137,13 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-
         return 
         vector field
         """
+        #print('EID term',i,j,k)
         if(k==0):
-            wf = np.heaviside(tau,1.0)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+sigxi*N1i+sigeh*N1eh))*tau)
+            wf = np.heaviside(tau,0.5)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+sigxi*N1i+sigeh*N1eh))*tau)
             lf = np.exp(-(tau13-tau)/T1)
             ei = T1*(1-np.exp((tau13-t)/T1))
         else:
-            wf = np.heaviside(tau,1.0)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigi*N1i+sigxi*N1+sigieh*N1eh))*tau)
+            wf = np.heaviside(tau,0.5)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigi*N1i+sigxi*N1+sigieh*N1eh))*tau)
             lf = np.exp(-(tau13-tau)/Ti1)
             ei = Ti1*(1-np.exp((tau13-t)/Ti1))
         tf = np.exp(1.0j*Ot[j]*(tau13-t))
@@ -160,11 +162,11 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-
         vector field
         """
         if(k==0):
-            wf =np.heaviside(-tau,1.0)*np.exp(1.0j*(O[i]-1.0j*(sigx*N2+sigxi*N2i+sigeh*N2eh))*tau)
+            wf =np.heaviside(-tau,0.5)*np.exp(1.0j*(O[i]-1.0j*(sigx*N2+sigxi*N2i+sigeh*N2eh))*tau)
             lf = np.exp(-(tau13)/T1)
             ei =T1*(1-np.exp((tau13-t)/T1))
         else: 
-            wf =np.heaviside(-tau,1.0)*np.exp(1.0j*(O[i]-1.0j*(sigi*N2+sigxi*N2i+sigieh*N2eh))*tau)
+            wf =np.heaviside(-tau,0.5)*np.exp(1.0j*(O[i]-1.0j*(sigi*N2+sigxi*N2i+sigieh*N2eh))*tau)
             lf = np.exp(-(tau13)/Ti1)
             ei =Ti1*(1-np.exp((tau13-t)/Ti1))
         tf = np.exp(1.0j*Ot[j]*(tau13-t))
@@ -187,8 +189,8 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-
             for i in range(4):
                 if(i<2):
                     sig = sig+PSF*(aterm(t,tau,i,j,0)+bterm(t,tau,i,j,0))
-                sig =sig+EID*A*sigv[int(np.floor(i/2))]*(cterm(t,tau,i,j,int(np.floor(i/2)))+dterm(t,tau,i,j,int(np.floor(i/2))))
-        return 1*K*-1.0j*A/(c.hbar**3)*np.heaviside(t-tau13,1.0)*sig
+                #sig =sig+EID*A*sigv[int(np.floor(i/2))]*(cterm(t,tau,i,j,int(np.floor(i/2)))+dterm(t,tau,i,j,int(np.floor(i/2))))
+        return 1*K*-1.0j*A/(c.hbar**3)*np.heaviside(t-tau13,.5)*sig
     def Pimp(t,tau):
         """
         Polarization of the general exciton states of the Ga As Coreshell Cap nanowires 
@@ -202,17 +204,20 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,tau=0e-
         """
         sig=0
         for j in range(2):
-            sig = sig + PSF*(aterm(t,tau,j+2,j+2,0)+bterm(t,tau,j+2,j+2,0))
-            for i in range(4):
-                if(i>1):
-                    sig = sig+PSF*(aterm(t,tau,i,j+2,0)+bterm(t,tau,i,j+2,0))
-                sig =sig+EID*Ai*sigv[int(np.floor(i/2))]*(cterm(t,tau,i,j+2,int(np.floor(i/2)))+dterm(t,tau,i,j+2,int(np.floor(i/2))))
-        return 1*K*(-1.0j)*Ai/(c.hbar**3)*np.heaviside(t-tau13,1.0)*sig
+            sig = sig + 2*PSF*(aterm(t,tau,j+2,j+2,1)+bterm(t,tau,j+2,j+2,1))
+            #for i in range(4):
+                #if(i>1):
+                #    sig = sig+PSF*(aterm(t,tau,i,j+2,1)+bterm(t,tau,i,j+2,1))
+                #sig =sig+EID*Ai*sigv[int(np.floor(i/2))]*(cterm(t,tau,i,j+2,int(np.floor(i/2)))+dterm(t,tau,i,j+2,int(np.floor(i/2))))
+        return 1*K*(-1.0j)*Ai/(c.hbar**3)*np.heaviside(t-tau13,.5)*sig
     def P(t,tau):
         return nw*Pnw(t,tau)+imp*Pimp(t,tau)
     def FWM(t,tau):
         return np.abs(P(t,tau))[0]
-    return FWM(t,tau)
+    def dirac(t,tau):
+        a = 0+(np.abs(t-tau13)<.03e-12)&(np.abs(tau)<.03e-12)
+        return a
+    return FWM(t,tau)+Ad*dirac(t,tau)
 def fitfuncttau(tau,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,t=7.1e-12):
     u1  = np.asarray([1.0,0.0])#polarization state pulse 1
     u2  = np.asarray([1.0,0.0])#polarization state pulse 2
@@ -267,7 +272,7 @@ def fitfuncttau(tau,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,t=7
     O  = np.asarray([ O21, O61, Oi21, Oi61]) 
     Ot = np.asarray([Ot21,Ot61,Oti21,Oti61]) 
 
-    tau13 = 7.0e-12 
+    tau13 = 4.0e-12 
     mu21 = ol21*np.asarray([1.0,0.0])   #dipole moment of hh exciton state 
     mu61 = ol61*np.asarray([1.0,0.0])   #dipole moment of lh exciton state 
     mui21 = oli21*np.asarray([1.0,0.0]) #dipole moment of hh bound exciton state 
@@ -399,7 +404,7 @@ def fitfuncttau(tau,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,t=7
                 if(i<2):
                     sig = sig+PSF*(aterm(t,tau,i,j,0)+bterm(t,tau,i,j,0))
                 sig =sig+EID*A*sigv[int(np.floor(i/2))]*(cterm(t,tau,i,j,int(np.floor(i/2)))+dterm(t,tau,i,j,int(np.floor(i/2))))
-        return 1*K*-1.0j*A/(c.hbar**3)*np.heaviside(t-tau13,1.0)*sig
+        return 1*K*-1.0j*A/(c.hbar**3)*np.heaviside(t-tau13,0.5)*sig
     def Pimp(t,tau):
         """
         Polarization of the general exciton states of the Ga As Coreshell Cap nanowires 
@@ -418,7 +423,7 @@ def fitfuncttau(tau,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,t=7
                 if(i>1):
                     sig = sig+PSF*(aterm(t,tau,i,j+2,0)+bterm(t,tau,i,j+2,0))
                 sig =sig+EID*Ai*sigv[int(np.floor(i/2))]*(cterm(t,tau,i,j+2,int(np.floor(i/2)))+dterm(t,tau,i,j+2,int(np.floor(i/2))))
-        return 1*K*(-1.0j)*Ai/(c.hbar**3)*np.heaviside(t-tau13,1.0)*sig
+        return 1*K*(-1.0j)*Ai/(c.hbar**3)*np.heaviside(t-tau13,0.5)*sig
     def P(t,tau):
         return nw*Pnw(t,tau)+imp*Pimp(t,tau)
     def FWM(t,tau):
