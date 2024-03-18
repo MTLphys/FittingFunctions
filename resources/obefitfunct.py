@@ -38,11 +38,11 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=
     Ti1= 100.0e-12 #impurity bound exciton Lifetime
     
 
-    E0 =c.e*(1.507)/c.hbar 
+    E0 =c.e*(1.5095)/c.hbar 
     E21 =  E0 
-    E61 =  E0+Ex1 
+    E61 =  E0-Ex1 
     Ei21 = E0+EB 
-    Ei61 = E0+Ex2+EB 
+    Ei61 = E0-Ex2+EB 
     O21 =  E21 -1.0j*gm21  #Base damped oscillator frequency  
     O61 =  E61 -1.0j*gm61  #Base damped oscillator frequency  
     Oi21 = Ei21 -1.0j*gmi21 #Base damped oscillator frequency
