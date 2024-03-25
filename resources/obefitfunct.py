@@ -41,8 +41,8 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=
     E0 =c.e*(1.5095)/c.hbar 
     E21 =  E0 
     E61 =  E0-Ex1 
-    Ei21 = E0+EB 
-    Ei61 = E0-Ex2+EB 
+    Ei21 = E0-EB 
+    Ei61 = E0-Ex2-EB 
     O21 =  E21 -1.0j*gm21  #Base damped oscillator frequency  
     O61 =  E61 -1.0j*gm61  #Base damped oscillator frequency  
     Oi21 = Ei21 -1.0j*gmi21 #Base damped oscillator frequency
@@ -185,10 +185,10 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=
         """
         sig=0
         for j in range(2):
-            sig = sig + PSF*(aterm(t,tau,j,j,0)+bterm(t,tau,j,j,0))
-            for i in range(4):
-                if(i<2):
-                    sig = sig+PSF*(aterm(t,tau,i,j,0)+bterm(t,tau,i,j,0))
+            sig = sig + 2*PSF*(aterm(t,tau,j,j,0)+bterm(t,tau,j,j,0))
+            #for i in range(4):
+            #    if(i<2):
+            #        sig = sig+PSF*(aterm(t,tau,i,j,0)+bterm(t,tau,i,j,0))
                 #sig =sig+EID*A*sigv[int(np.floor(i/2))]*(cterm(t,tau,i,j,int(np.floor(i/2)))+dterm(t,tau,i,j,int(np.floor(i/2))))
         return 1*K*-1.0j*A/(c.hbar**3)*np.heaviside(t-tau13,.5)*sig
     def Pimp(t,tau):
