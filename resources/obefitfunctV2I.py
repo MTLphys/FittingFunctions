@@ -1,4 +1,3 @@
-
 import scipy.constants as c
 import numpy as np 
 import matplotlib.pyplot as plt 
@@ -21,11 +20,11 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=
 
 
 
-    sigx   = 0.0001 #exciton exciton scattering Parameter
-    sigeh  = 0.0005 #exciton electron/hole scattering Parameter 
-    sigxi  = 0.0001 #exciton impurity scattering Parameter
-    sigi   = 0.0000 #impurity impurity scattering Parameter
-    sigieh = 0.0005 #impurity electron/hole scattering Parameter
+    sigx   = 0.00016 #exciton exciton scattering Parameter
+    sigeh  = 0.00050 #exciton electron/hole scattering Parameter 
+    sigxi  = 0.00016 #exciton impurity scattering Parameter
+    sigi   = 0.00000 #impurity impurity scattering Parameter
+    sigieh = 0.00050 #impurity electron/hole scattering Parameter
     sigv = np.asarray([sigx,sigxi,sigi])
     sigvchk = np.asarray(['sigx','sigxi','sigi'])
 
@@ -52,8 +51,8 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=
     Oi21 = Ei21 -1.0j*gmi21 #Base damped oscillator frequency
     Oi61 = Ei61 -1.0j*gmi61 #Base damped oscillator frequency
 
-    Ot21 =  O21 -1.0j*(sigx*A+ sigxi*3*Ai+sigeh*Aeh) #Base Eid oscillator frequency
-    Ot61 =  O61 -1.0j*(sigxi*Ai+sigeh*Aeh)#Base Eid oscillator frequency
+    Ot21 =  O21 -1.0j*(sigx*(2*A)+ sigxi*2*Ai+sigeh*Aeh) #Base Eid oscillator frequency
+    Ot61 =  O61 -1.0j*(sigx*(2*A)+sigxi*2*Ai+sigeh*Aeh)#Base Eid oscillator frequency
     Oti21 = Oi21-1.0j*(sigxi*A+ sigieh*Aeh)#Base Eid oscillator frequency
     Oti61 = Oi61-1.0j*(sigxi*A+ sigieh*Aeh)#Base Eid oscillator frequency
 
@@ -100,7 +99,7 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=
         '''
         #print('PSF Term',i,j,k)
         if(k==0):
-            wf = np.heaviside(tau,0.5)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigx*N1+3*sigxi*N1i+sigeh*N1eh))*tau)
+            wf = np.heaviside(tau,0.5)*np.exp(1.0j*(np.conj(O[i])+1.0j*(2*sigx*N1+2*sigxi*N1i+sigeh*N1eh))*tau)
             lf = np.exp(-(tau13-tau)/T1)
         else:
             wf =  np.heaviside(tau,0.5)*np.exp(1.0j*(np.conj(O[i])+1.0j*(sigxi*N1+sigieh*N1eh))*tau)
@@ -121,7 +120,7 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=
         vector field
         """
         if(k==0):    
-            wf = np.heaviside(-tau,0.5)*np.exp(1.0j*(O[i]-1.0j*(sigx*N2+3*sigxi*N2i+sigeh*N2eh))*tau)
+            wf = np.heaviside(-tau,0.5)*np.exp(1.0j*(O[i]-1.0j*(2*sigx*N2+2*sigxi*N2i+sigeh*N2eh))*tau)
             lf = np.exp(-(tau13)/T1)
         else:
             wf = np.heaviside(-tau,0.5)*np.exp(1.0j*(O[i]-1.0j*(sigxi*N2+sigieh*N2eh))*tau)
@@ -189,12 +188,11 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=
         """
         sig=0
         for j in range(2):
-            sig = sig + 2*PSF*(aterm(t,tau,j,j,j)+bterm(t,tau,j,j,j))
-            #for i in range(4):
-            #    if(i<2):
-            #        sig = sig+PSF*(aterm(t,tau,i,j,0)+bterm(t,tau,i,j,0))
+            sig = sig + PSF*(aterm(t,tau,j,j,0)+bterm(t,tau,j,j,0))
+            for i in range(2):
+                sig = sig+PSF*(aterm(t,tau,i,j,0)+bterm(t,tau,i,j,0))
                 #sig =sig+EID*A*sigv[int(np.floor(i/2))]*(cterm(t,tau,i,j,int(np.floor(i/2)))+dterm(t,tau,i,j,int(np.floor(i/2))))
-        return -1*K*1.0j*A/(c.hbar**3)*np.heaviside(t-tau13,.5)*sig
+        return -1*K*1.0j*(2*A)/(c.hbar**3)*np.heaviside(t-tau13,.5)*sig
     def Pimp(t,tau):
         """
         Polarization of the general exciton states of the Ga As Coreshell Cap nanowires 
