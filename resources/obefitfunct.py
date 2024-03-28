@@ -21,11 +21,11 @@ def fitfunctt(t,Ex1,Ex2,EB,ol21,ol61,oli21,oli61,gm21,gm61,gmi21,gmi61,K,Ad,tau=
 
 
 
-    sigx   = 0.00016 #exciton exciton scattering Parameter
-    sigeh  = 0.00050 #exciton electron/hole scattering Parameter 
-    sigxi  = 0.00016 #exciton impurity scattering Parameter
-    sigi   = 0.00000 #impurity impurity scattering Parameter
-    sigieh = 0.00050 #impurity electron/hole scattering Parameter
+    sigx   = 0.0001 #exciton exciton scattering Parameter
+    sigeh  = 0.0005 #exciton electron/hole scattering Parameter 
+    sigxi  = 0.0001 #exciton impurity scattering Parameter
+    sigi   = 0.0000 #impurity impurity scattering Parameter
+    sigieh = 0.0005 #impurity electron/hole scattering Parameter
     sigv = np.asarray([sigx,sigxi,sigi])
     sigvchk = np.asarray(['sigx','sigxi','sigi'])
 
