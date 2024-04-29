@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt 
 import numpy as np 
 import glob as gb 
-directory = 'C:/Users/mattl/OneDrive - University of Cincinnati/Desktop/Lab Data/HFWMV2 CS NW InitialTest/LongCollections/Testing Locations/'
+directory = 'C:/Users/mattl/OneDrive - University of Cincinnati/Desktop/Lab Data/HFWMV2 CS NW InitialTest/6K Measurements/'
 endmoniker = ''
 filetype = '.csv'
 outputfile = 'Results/'
@@ -16,14 +16,14 @@ for file in files :
     filetag = file[len(directory):-4]
     contents = np.loadtxt(file,delimiter=';')
     indicest12= np.where(np.round(10*np.abs(contents[:,0]))<=10*integration)[0]
-    #print(indicest12)
+    print(indicest12)
     t12cut = np.sum(contents[indicest12[1:],:],axis=0)/(len(indicest12)-1)
     t12 = contents[0,:]
     t12cut = t12cut-np.min(t12cut[1:])+1e-7
     axs[0].plot(t12[1:],t12cut[1:],label = filetag[-6:])
     axs[0].legend()
     indicest3ref= np.where(np.abs(contents[0,:])<=integration)[0]
-    #print(indicest3ref)
+    print(indicest3ref)
     t3refcut = np.sum(contents[:,indicest3ref[1:]],axis=1)/(len(indicest3ref)-1)
     t3refcut = t3refcut-np.min(t3refcut[1:])+1e-7
     t3ref = contents[:,0]
