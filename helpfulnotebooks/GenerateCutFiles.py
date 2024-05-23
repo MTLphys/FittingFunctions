@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt 
 import numpy as np 
 import glob as gb 
-directory = 'C:/Users/mattl/OneDrive - University of Cincinnati/Desktop/Lab Data/InP Nanowires On Saphire for FWM/powervwavelength/823nm/'
+directory = 'C:/Users/mattl/OneDrive - University of Cincinnati/Desktop/Lab Data/InP Nanowires On Saphire for FWM/barewires/828nm/'
 endmoniker = ''
 filetype = '.csv'
 outputfile = 'Results/'
@@ -14,7 +14,7 @@ print(files)
 for file in files : 
     print(file)
     filetag = file[len(directory):-4]
-    contents = np.loadtxt(file,delimiter=',')
+    contents = np.loadtxt(file,delimiter=';')
     indicest12= np.where(np.round(10*np.abs(contents[:,0]))<=10*integration)[0]
     print(indicest12)
     t12cut = np.sum(contents[indicest12[1:],:],axis=0)/(len(indicest12)-1)
