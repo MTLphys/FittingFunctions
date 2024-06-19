@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt 
 import numpy as np 
 import glob as gb 
-directory = 'C:/Users/mattl/OneDrive - University of Cincinnati/Desktop/Lab Data/HFWM Diagnositics/'
+directory = 'C:/Users/mattl/OneDrive - University of Cincinnati/Desktop/Lab Data/InP Nanowires On Saphire for FWM/barewires/828nm/'
 endmoniker = ''
 filetype = '.csv'
 outputfile = 'Results/'
