@@ -1,6 +1,6 @@
 import numpy as np 
 import matplotlib.pyplot as plt  
-from scipy import optimize
+from scipy import optimize as o
 from scipy import special as s 
 
 class Fitter:
@@ -21,7 +21,7 @@ class Fitter:
         self.fittype  = ['Gauss']
         self.centroid = [0]
         self.FWHM     = [10] 
-        self.y0       = [0]
+        self.y0       = 0
         self.A        = [1]
         self.roi      = [0,50]
         
@@ -35,35 +35,35 @@ class Fitter:
                 args.append(self.FWHM[j])
                 j+= 1
                 args.append(self.FWHM[j])
-                args.append(self.y0[i])
                 args.append(self.A[i])
             if (type =='Gauss')^(type =="Lorentz"):
                 args.append(self.centroid[i])
                 args.append(self.FWHM[j])
-                args.append(self.y0[i])
                 args.append(self.A[i])
             j+= 1
+        args.append(self.y0)
         return args
     
     def setargs(self,args):
         j=0
         k=0
+        self.y0= args[-1]
+        #print('arguments in set args',args)
         for i,type in enumerate(self.fittype):
             if type=='Voigt':
                 self.centroid[i]= args[k]
                 self.FWHM[j]    = args[k+1]
                 j+=1
                 self.FWHM[j]    = args[k+2]
-                self.y0[i]      = args[k+3]
-                self.A[i]       = args[k+4]
-                k+= 5 
+                self.A[i]       = args[k+3]
+                k+= 4 
             if (type =='Gauss')^(type =="Lorentz"):
                 self.centroid[i] =  args[k]
                 self.FWHM[j]     = args[k+1]
-                self.y0[i]        = args[k+1]
-                self.A[i]       = args[k+1]
-                k+= 4
+                self.A[i]       = args[k+2]
+                k+= 3
             j+=1
+            
     def voigt(x,A,FWHM1,FWHM2,centroid):
         sig = FWHM1/(2*np.sqrt(2*np.log(2)))
         gamma = FWHM2/2
@@ -76,21 +76,41 @@ class Fitter:
     def lorentz(x,A,FWHM,centroid):  
         gamma = FWHM/2    
         return A*1/((1)+((x-centroid)/gamma)**2)
-    
-    def fitfunct(self,x,args):
-        print(args)
+    def pltfunct(self,x):
+        j = 0
+        results = np.zeros_like(x)
+        for i,type in enumerate(self.fittype):
+            print(type)
+            if (type=='Voigt'):
+                results += Fitter.voigt(x,self.A[i],self.FWHM[j],self.FWHM[j+1],self.centroid[i]) 
+                j+=1
+            if (type =='Gauss'):
+                results += Fitter.gauss(x,self.A[i],self.FWHM[j],self.centroid[i])
+            if (type =="Lorentz"):
+                results += Fitter.lorentz(x,self.A[i],self.FWHM[j],self.centroid[i]) 
+            j+=1
+        return results + self.y0
+    def fitfunct(self,x,*args):
         results = np.zeros(len(x))
         j= 0
         self.setargs(args)
         for i,type in enumerate(self.fittype):
             if (type=='Voigt'):
-                results = Fitter.voigt(x,self.A[i],self.FWHM[j],self.FWHM[j+1],self.centroid[i]) 
+                results += Fitter.voigt(x,self.A[i],self.FWHM[j],self.FWHM[j+1],self.centroid[i]) 
                 j+=1
             if (type =='Gauss'):
-                results = Fitter.gauss(x,self.A[i],self.FWHM[j],self.centroid[i])
+                results += Fitter.gauss(x,self.A[i],self.FWHM[j],self.centroid[i])
             if (type =="Lorentz"):
-                results = Fitter.lorentz(x,self.A[i],self.FWHM[j],self.centroid[i]) 
+                results += Fitter.lorentz(x,self.A[i],self.FWHM[j],self.centroid[i]) 
             j+=1
-        return results
-                
+        return results+self.y0
+        
+    def fit1d(self,x,y):
+        pinit = self.getargs()
+        print('fitparameters before fitting',pinit)
+        poutp = o.curve_fit(self.fitfunct,x,y,p0=pinit)
+        print('fit parameters after fit',poutp[0])
+        self.setargs(poutp[0])
+        
+                    
         
