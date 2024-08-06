@@ -7,8 +7,31 @@ ymax = 3
 Nx = 121
 Ny = 81
 
+def averageandreduce(x,y):
+    prevx= np.nan
+    newx = []
+    newy = []
+    xtemp = 0
+    ytemp = 0 
+    for i,xa in enumerate(x):
+        if(np.abs(xa-prevx)<.01):
+            avgover +=1 
+            xtemp=(xtemp*(avgover-1)+xa)/avgover
+            ytemp=y[i]       
+        else:
+            if(i!=0):
+                newx.append(xtemp)
+                newy.append(ytemp)
+            xtemp=xa
+            ytemp=y[i]
+            avgover = 1
+        prevx= xa
+    newx = np.asarray(newx)
+    newy = np.asarray(newy) 
+    return newx,newy 
+
 import glob as gb 
-directory = 'C:/Users/mattl/OneDrive - University of Cincinnati/Desktop/Lab Data/HFWMV2 CS NW InitialTest/830nm/Longboi/'
+directory = 'C:/Users/mattl/OneDrive - University of Cincinnati/Desktop/Lab Data/InP Nanowires On Saphire for FWM/powervwavelength/833nm/stinky/'
 endmoniker = ''
 filetype = '.csv'
 outputfile = 'Results/'
@@ -16,12 +39,12 @@ integration= .15
 files = gb.glob(directory+'*'+endmoniker+filetype)
 
 print(files)
-file = files[1]
+
 
 for file in files : 
     print(file)
     filetag = file[len(directory):-4]
-    contents = np.loadtxt(file,delimiter=';')
+    contents = np.loadtxt(file,delimiter=',',skiprows=1)
     t12 = contents[0,1:]
     t3ref = contents[1:,0]
 
@@ -65,6 +88,7 @@ for file in files :
     fig.colorbar(cset2)
     r = Rf[Rind]
     z = ZMf[Rind]
+    r,z = averageandreduce(r,z)
     ax[1,1].plot(r,z)
     ax[1,1].set_yscale('log')
     output= np.vstack((r,z)).transpose()
