@@ -1,0 +1,12 @@
+{
+    "git.ignoredRepositories": [
+        ".env ",
+        ".venv",
+        "env/ ",
+        "venv/ ",
+        "env.bak/ ",
+        "venv.bak/"
+    ],
+    "search.useGlobalIgnoreFiles": false,
+    "search.useParentIgnoreFiles": false
+}
