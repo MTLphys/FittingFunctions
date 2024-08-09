@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt  
 from scipy import optimize as o
 from scipy import special as s 
-
+from scipy import signal as si
 class Fitter:
     """System for fitting to multipeak data
     Used to fit data with peaks discribed by lorentz, guassian or voigt profiles
@@ -104,6 +104,25 @@ class Fitter:
                 results += Fitter.lorentz(x,self.A[i],self.FWHM[j],self.centroid[i]) 
             j+=1
         return results+self.y0
+    def peakid(self,x,y,filt='boxcar',filtwidth=15,cutoff=5):
+        if(filt=='boxcar'):
+            window   = si.windows.boxcar(filtwidth)
+        if(filt=='laplace'):
+            window  = si.windows.general_gaussian(filtwidth*10,p=.5,sig=filtwidth)
+        if(filt== 'gauss'):
+            window = si.windows.general_gaussian(filtwidth*10,p=1,sig=filtwidth)
+        if(filt=='hanning'):
+            window = si.windows.hann(filtwidth)
+        if(filt=='blackman'):
+            window = si.windows.blackman(filtwidth)
+        
+        filtered = y
+        filtered = si.fftconvolve(y,window,'same')
+        filtered = (np.average(y)/np.average(filtered))*filtered
+        #filtered = np.roll(filtered,-25)
+        peaks = si.argrelmax(filtered,order=8)[0]
+        peaks = peaks[y[peaks]>cutoff] 
+        return x[peaks],y[peaks],filtered
         
     def fit1d(self,x,y):
         pinit = self.getargs()
