@@ -3,6 +3,24 @@ import matplotlib.pyplot as plt
 from scipy import optimize as o
 from scipy import special as s 
 from scipy import signal as si
+
+class Processor: 
+    def __init__(self,x,y):
+        self.width = 1
+        self.x = x 
+        self.y = y 
+        self.Centroid 
+    def lorentz(x,A,FWHM,centroid):  
+        gamma = FWHM/2    
+        return A*1/((1)+((x-centroid)/gamma)**2)
+    
+    def LZp(self,x,A1,FWHM1,Centroid1,A2,FWHM2,Centroid2):
+        l1 = self.lorentz(x,A1,FWHM1,Centroid1)
+        l2 = self.lorentz(x,A2,FWHM2,Centroid2)
+        return l1*l2
+    def initzero(self,x,y):
+        
+        
 class Fitter:
     """System for fitting to multipeak data
     Used to fit data with peaks discribed by lorentz, guassian or voigt profiles
@@ -104,7 +122,8 @@ class Fitter:
                 results += Fitter.lorentz(x,self.A[i],self.FWHM[j],self.centroid[i]) 
             j+=1
         return results+self.y0
-    def peakid(self,x,y,filt='boxcar',filtwidth=15,cutoff=5):
+    def peakid(self,x,y,filt='boxcar',finder='relmax',filtwidth=15,cutoff=5):
+
         if(filt=='boxcar'):
             window   = si.windows.boxcar(filtwidth)
         if(filt=='laplace'):
@@ -118,9 +137,15 @@ class Fitter:
         
         filtered = y
         filtered = si.fftconvolve(y,window,'same')
-        filtered = (np.average(y)/np.average(filtered))*filtered
+        filtered = (np.average(y)/np.average(filtered))*filtered            
+    
+        if(finder == 'relmax'):
+            peaks =si.argrelmax(filtered,order=8)[0]
+        if (finder == 'peakfind'):
+            peaks =si.find_peaks(filtered,width=8,prominence= cutoff)
+
         #filtered = np.roll(filtered,-25)
-        peaks = si.argrelmax(filtered,order=8)[0]
+        
         peaks = peaks[y[peaks]>cutoff] 
         return x[peaks],y[peaks],filtered
         
