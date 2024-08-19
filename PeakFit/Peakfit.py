@@ -9,16 +9,42 @@ class Processor:
         self.width = 1
         self.x = x 
         self.y = y 
-        self.Centroid 
     def lorentz(x,A,FWHM,centroid):  
         gamma = FWHM/2    
         return A*1/((1)+((x-centroid)/gamma)**2)
     
-    def LZp(self,x,A1,FWHM1,Centroid1,A2,FWHM2,Centroid2):
+    def LZp(self,x,A1,FWHM1,Centroid1,FWHM2,Centroid2):
         l1 = self.lorentz(x,A1,FWHM1,Centroid1)
-        l2 = self.lorentz(x,A2,FWHM2,Centroid2)
+        l2 = self.lorentz(x,1,FWHM2,Centroid2)
         return l1*l2
-    def initzero(self,x,y):
+    def initroi(self,x=0,y=0):
+        if(x == 0):
+            x = self.x
+        if(y == 0):
+            y = self.y 
+        x0g = x[np.argmax(y)]
+        xroi= x[np.abs(x-x0g)<1.5]
+        yroi= y[np.abs(x-x0g)<1.5]
+        return xroi,yroi
+    def findzero(self,x=0,y=0):
+        if(x == 0):
+            x = self.x
+        if(y == 0):
+            y = self.y 
+        xroi,yroi =self.initroi()
+        Centroid = xroi.dot(yroi)/np.sum(yroi)
+        Amplitude = np.max(yroi)
+        Sigma = ((xroi-Centroid)**2).dot(yroi)/np.sum(yroi)
+        return Centroid,Amplitude,Sigma
+    def fitzero(self,x=0,y=0):
+        if(x == 0):
+            x = self.x
+        if(y == 0):
+            y = self.y
+        xroi,yroi= self.initroi()
+        Centroid,Amplitude,Sigma= self.findzero()
+        argguess = [Amplitude/2,Sigma,Centroid,Sigma*2,Centroid]
+        return 0
         
         
 class Fitter:
